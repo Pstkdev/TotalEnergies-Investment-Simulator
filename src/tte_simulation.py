@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 
 
 class TTESimulation:
@@ -19,6 +20,8 @@ class TTESimulation:
         reversion_speed: float,
         vol_high: float,
         vol_low: float,
+        p_high: float,
+        seed: int | None,
     ) -> None:
 
         self.initial_share_price = initial_share_price
@@ -53,7 +56,7 @@ class TTESimulation:
         self.start_year = start_year
         self.regime_scenario = regime_scenario
 
-        allowed = {"Always High", "Always Low"}
+        allowed = {"Always High", "Always Low", "Random"}
         if regime_scenario not in allowed:
             raise ValueError(f"regime_scenario must be one of {allowed}.")
 
@@ -74,14 +77,34 @@ class TTESimulation:
         if vol_high < 0 or vol_low < 0:
             raise ValueError("Volatility must be >= 0.")
 
+        self.p_high = p_high
+        if not (0.0 <= p_high <= 1.0):
+            raise ValueError("p_high must be between 0 and 1.")
+
+        self.seed = seed
+        self._regime_by_year = {}
+
     # --- helpers --- #
-    def _get_regime(self) -> str:
+    def _get_regime(self, year: int) -> str:
 
         if self.regime_scenario == "Always High":
             return "HIGH"
 
         if self.regime_scenario == "Always Low":
             return "LOW"
+
+        if self.regime_scenario == "Random":
+
+            if year in self._regime_by_year:
+                return self._regime_by_year[year]
+
+            base_seed = 0 if self.seed is None else int(self.seed)
+            rng = random.Random(base_seed + year * 10000)
+            regime = "HIGH" if rng.random() < self.p_high else "LOW"
+            self._regime_by_year[year] = regime
+            return regime
+
+        raise ValueError("Unknown regime.")
 
     def _target_price(self, regime: str) -> float:
 
