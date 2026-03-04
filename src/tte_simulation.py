@@ -53,7 +53,7 @@ class TTESimulation:
         self.start_year = start_year
         self.regime_scenario = regime_scenario
 
-        allowed = {"Always High", "Always Low", "Alternate"}
+        allowed = {"Always High", "Always Low"}
         if regime_scenario not in allowed:
             raise ValueError(f"regime_scenario must be one of {allowed}.")
 
@@ -73,3 +73,31 @@ class TTESimulation:
 
         if vol_high < 0 or vol_low < 0:
             raise ValueError("Volatility must be >= 0.")
+
+    # --- helpers --- #
+    def _get_regime(self) -> str:
+
+        if self.regime_scenario == "Always High":
+            return "HIGH"
+
+        if self.regime_scenario == "Always Low":
+            return "LOW"
+
+    def _target_price(self, regime: str) -> float:
+
+        if regime == "HIGH":
+            return self.mean_price_high
+
+        if regime == "LOW":
+            return self.mean_price_low
+
+        raise ValueError("Unknown regime.")
+
+    def _regime_vol(self, regime: str) -> float:
+        if regime == "HIGH":
+            return self.vol_high
+
+        if regime == "LOW":
+            return self.vol_low
+
+        raise ValueError("Unknown regime.")
