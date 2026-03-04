@@ -124,3 +124,12 @@ class TTESimulation:
             return self.vol_low
 
         raise ValueError("Unknown regime.")
+
+    def _next_price(self, current_price, target, vol, rng) -> float:
+
+        base = current_price + self.reversion_speed * (target - current_price)
+        noise = current_price * vol * rng.gauss(0, 1)
+
+        next_price = base + noise
+
+        return max(1.0, next_price)
