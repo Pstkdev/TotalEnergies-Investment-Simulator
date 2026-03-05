@@ -127,7 +127,7 @@ class TTESimulation:
 
     def _next_price(self, current_price, target, vol, rng) -> float:
 
-        base = current_price + self.reversion_speed * (target - current_price)
+        base = current_price + self.reversion_speed * (target - current_price)  # mean reverting
         noise = current_price * vol * rng.gauss(0, 1)
 
         next_price = base + noise
