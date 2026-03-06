@@ -54,6 +54,7 @@ class TTESimulation:
             raise ValueError("years must be >= 1.")
 
         self.start_year = start_year
+
         self.regime_scenario = regime_scenario
 
         allowed = {"Always High", "Always Low", "Random"}
@@ -83,6 +84,11 @@ class TTESimulation:
 
         self.seed = seed
         self._regime_by_year = {}
+        self.total_shares = 0
+        self.cash_dividends = 0.0
+        self.cash_contrib = 0.0
+
+        self.results: pd.DataFrame | None = None
 
     # --- helpers --- #
     def _get_regime(self, year: int) -> str:
@@ -125,7 +131,7 @@ class TTESimulation:
 
         raise ValueError("Unknown regime.")
 
-    def _next_price(self, current_price, target, vol, rng) -> float:
+    def _next_price(self, current_price: float, target: float, vol: float, rng) -> float:
 
         base = current_price + self.reversion_speed * (target - current_price)  # mean reverting
         noise = current_price * vol * rng.gauss(0, 1)
@@ -133,3 +139,117 @@ class TTESimulation:
         next_price = base + noise
 
         return max(1.0, next_price)
+
+    def _quarter_prices(self, p_start, p_end) -> list[float]:
+        q1 = p_start * 0.875 + p_end * 0.125
+        q2 = p_start * 0.625 + p_end * 0.375
+        q3 = p_start * 0.375 + p_end * 0.625
+        q4 = p_start * 0.125 + p_end * 0.875
+
+        return [q1, q2, q3, q4]
+
+    def _buy_shares_with_amount(self, share_price: float, amount: float) -> float:
+
+        if share_price <= 0:
+            raise ValueError("Share price must be > 0")
+
+        if amount < share_price:
+            return amount
+
+        shares_bought = int(amount // share_price)
+        spent = shares_bought * share_price
+        remaining = amount - spent
+
+        if shares_bought > 0:
+            self.total_shares += shares_bought
+
+        return remaining
+
+    def run_simulation(self) -> pd.DataFrame:
+
+        self.total_shares = self.initial_shares
+        self.cash_dividends = 0.0
+        self.cash_contrib = 0.0
+        self._regime_by_year = {}
+
+        rng = random.Random(self.seed)
+
+        share_price = self.initial_share_price
+        dividend_per_share = self.initial_dividend
+
+        total_invested = self.initial_shares * self.initial_share_price
+        total_div_received = 0.0
+
+        rows = []
+        # Year 0
+        rows.append(
+            {
+                "Year": 0,
+                "Calendar year": self.start_year,
+                "Share price": share_price,
+                "Total shares": self.total_shares,
+                "Cash": 0.0,
+                "Portfolio value": self.total_shares * share_price,
+                "Dividends received": 0.0,
+                "Total dividends received": 0.0,
+                "Total invested": total_invested,
+            }
+        )
+
+        for year in range(1, self.years + 1):
+
+            calendar_year = self.start_year + year
+
+            # market regime and yearly price move
+            regime = self._get_regime(year)
+            target = self._target_price(regime)
+            vol = self._regime_vol(regime)
+
+            p_end = self._next_price(share_price, target, vol, rng)
+            q_prices = self._quarter_prices(share_price, p_end)
+
+            # Update dividend
+            dividend_per_share *= 1 + self.dividend_growth_rate
+            dps_quarter = dividend_per_share / 4.0
+            annual_dividend_received = 0.0
+
+            # Quarters logic
+            for qp in q_prices:
+                # contributions
+                q_contrib = self.monthly_investment * 3
+                total_invested += q_contrib
+                self.cash_contrib += q_contrib
+                self.cash_contrib = self._buy_shares_with_amount(qp, self.cash_contrib)
+
+                # dividends received
+                q_div = self.total_shares * dps_quarter
+                annual_dividend_received += q_div
+                total_div_received += q_div
+                self.cash_dividends += q_div
+
+                # reinvest dividends
+                if self.reinvest_dividends:
+                    self.cash_dividends = self._buy_shares_with_amount(qp, self.cash_dividends)
+
+            total_cash = self.cash_dividends + self.cash_contrib
+            portfolio_value = total_cash + self.total_shares * p_end
+
+            rows.append(
+                {
+                    "Year": year,
+                    "Calendar year": calendar_year,
+                    "Regime": regime,
+                    "Share price": p_end,
+                    "Total shares": self.total_shares,
+                    "Cash": total_cash,
+                    "Portfolio value": portfolio_value,
+                    "Dividends received": annual_dividend_received,
+                    "Total dividends received": total_div_received,
+                    "Total invested": total_invested,
+                }
+            )
+            # next year price
+            share_price = p_end
+
+        self.results = pd.DataFrame(rows)
+        return self.results
