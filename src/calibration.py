@@ -1,9 +1,10 @@
-import yfinance as yf
-import pandas as pd
 import math
+import pandas as pd
+import yfinance as yf
 
 
 def fetch_adj_close(ticker: str, start: str, end: str | None = None) -> pd.Series:
+    """Fetch daily Adjusted Close prices from Yahoo Finance."""
     df = yf.download(
         ticker,
         start=start,
@@ -24,51 +25,46 @@ def fetch_adj_close(ticker: str, start: str, end: str | None = None) -> pd.Serie
             adj = adj.iloc[:, 0]
 
     s = adj.dropna()
+    s.index = pd.to_datetime(s.index)
     s.name = ticker
     return s
 
 
 def monthly_mean_price(series: pd.Series) -> pd.Series:
-    return series.resample("ME").mean()
+    """Convert daily prices to monthly mean prices."""
+    return series.resample("ME").mean().dropna()
 
 
-def tte_monthly_stats(tte_daily: pd.Series) -> dict:
-    tte_m = monthly_mean_price(tte_daily).dropna()
+def tte_vol_annual_last_20y(ticker: str = "TTE.PA") -> dict:
+    """
+    Compute annualised volatility over the last 20 years:
+    - Build monthly mean prices
+    - Compute monthly returns
+    - Annualise: std(monthly_returns) * sqrt(12)
+    """
+    daily = fetch_adj_close(ticker, start="2000-01-01")
+    monthly = monthly_mean_price(daily)
 
-    # monthly returns based on monthly mean prices
-    r_m = tte_m.pct_change().dropna()
+    if monthly.empty:
+        raise ValueError("No monthly data after resampling.")
+
+    end_date = monthly.index.max()
+    start_cut = end_date - pd.DateOffset(years=20)
+    monthly_20y = monthly[monthly.index >= start_cut].dropna()
+
+    if monthly_20y.shape[0] < 24:
+        raise ValueError("Not enough data to compute volatility (need at least ~24 months).")
+
+    r_m = monthly_20y.pct_change().dropna()
 
     vol_monthly = float(r_m.std())
     vol_annual = vol_monthly * math.sqrt(12)
 
-    q = tte_m.quantile([0.10, 0.25, 0.50, 0.75, 0.90])
     return {
-        "n_months": int(tte_m.shape[0]),
-        "price_q10": float(q.loc[0.10]),
-        "price_q25": float(q.loc[0.25]),
-        "price_q50": float(q.loc[0.50]),
-        "price_q75": float(q.loc[0.75]),
-        "price_q90": float(q.loc[0.90]),
+        "ticker": ticker,
+        "start": str(monthly_20y.index.min().date()),
+        "end": str(monthly_20y.index.max().date()),
+        "n_months": int(monthly_20y.shape[0]),
         "vol_monthly": vol_monthly,
         "vol_annual": vol_annual,
     }
-
-
-def smoke_test():
-    tte = fetch_adj_close("TTE.PA", start="2006-01-01")
-    stats = tte_monthly_stats(tte)
-
-    print("Months:", stats["n_months"])
-    print("Price quantiles (monthly mean):")
-    print("  Q10:", stats["price_q10"])
-    print("  Q25:", stats["price_q25"])
-    print("  Q50 (recommended long_run_price):", stats["price_q50"])
-    print("  Q75:", stats["price_q75"])
-    print("  Q90:", stats["price_q90"])
-    print("Volatility:")
-    print("  monthly std:", stats["vol_monthly"])
-    print("  annualised (std*sqrt(12)):", stats["vol_annual"])
-
-
-if __name__ == "__main__":
-    smoke_test()
