@@ -101,6 +101,14 @@ class TTESimulation:
         return remaining
 
     def run_simulation(self) -> pd.DataFrame:
+        """
+        Run the simulation and return a yearly results DataFrame.
+
+        For each year, the model simulates an end-of-year share price, pays dividends
+        quarterly (with optional reinvestment), invests monthly contributions (grouped
+        by quarter) and tracks total shares, cash, portfolio value, dividends, and
+        invested capital.
+        """
         self.total_shares = self.initial_shares
         self.cash_dividends = 0.0
         self.cash_contrib = 0.0
