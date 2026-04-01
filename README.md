@@ -8,6 +8,11 @@ The price path is simulated using a simple **mean-reverting model + annual volat
 
 Dividends are modelled as **quarterly** payments, in line with TotalEnergies’ quarterly dividend policy.
 
+<p align="center">
+  <img src="assets/demo.gif" width="700" alt="demo gif">
+</p>
+
+
 ---
 
 ## Disclaimer
