@@ -6,6 +6,7 @@ from src.calibration import tte_vol_annual_last_20y
 
 st.set_page_config(page_title="TotalEnergies Simulator", layout="wide")
 st.title("TotalEnergies Investment Simulator (TTE)")
+st.caption("Built by Pstkdev")
 
 with st.expander("Model assumptions"):
     st.markdown(
@@ -177,9 +178,11 @@ fig_value.update_traces(line=dict(color="#DCBB37"))
 st.plotly_chart(fig_value, use_container_width=True)
 
 fig_price = px.line(df, x="Calendar year", y="Share price", title="Simulated share price over time")
+fig_price.update_traces(line=dict(color="#DCBB37"))
 st.plotly_chart(fig_price, use_container_width=True)
 
 fig_shares = px.bar(df, x="Calendar year", y="Total shares", title="Total shares over time")
+fig_shares.update_traces(marker_color="#DCBB37")
 st.plotly_chart(fig_shares, use_container_width=True)
 
 st.divider()

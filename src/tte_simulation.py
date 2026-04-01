@@ -76,7 +76,7 @@ class TTESimulation:
     def _quarter_prices(self, p_start: float, p_end: float) -> list[float]:
         """
         Simple linear interpolation over 4 quarters.
-        Used only to decide the price at each quarterly buy/reinvest event.
+        Used only to estimate the price at each quarterly buy/reinvest event.
         """
         q1 = p_start * 0.875 + p_end * 0.125
         q2 = p_start * 0.625 + p_end * 0.375
