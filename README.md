@@ -1,9 +1,11 @@
 # TotalEnergies Investment Simulator (TTE)
 
 A **stochastic** long-term simulator for an investment in **TotalEnergies (TTE)** shares over a chosen time horizon.  
+
 This project includes a **Streamlit** interface: users can adjust parameters (dividend growth, dividend reinvestment, monthly contributions, mean reversion, volatility) and see results and charts update instantly.
 
-The price path is simulated using a simple **mean-reverting model + annual volatility shocks**.  
+The price path is simulated using a simple **mean-reverting model + annual volatility shocks**.
+
 Dividends are modelled as **quarterly** payments, in line with TotalEnergies’ quarterly dividend policy.
 
 ---
