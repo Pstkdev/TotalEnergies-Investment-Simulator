@@ -1,5 +1,11 @@
 # TotalEnergies Investment Simulator (TTE)
 
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-purple?logo=pandas&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-Visualization-black?logo=plotly&logoColor=white)
+
 A **stochastic** long-term simulator for an investment in **TotalEnergies (TTE)** shares over a chosen time horizon.  
 
 This project includes a **Streamlit** interface: users can adjust parameters (dividend growth, dividend reinvestment, monthly contributions, mean reversion, volatility) and see results and charts update instantly.
