@@ -2,7 +2,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-orange?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-green?logo=pandas&logoColor=white)
 ![Plotly](https://img.shields.io/badge/Plotly-Visualization-purple?logo=plotly&logoColor=white)
 
