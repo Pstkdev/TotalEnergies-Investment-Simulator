@@ -119,6 +119,8 @@ This project is designed for **scenario exploration**, not exact forecasting. Re
 
 ## Installation
 
+### Option A — Local (Python venv)
+
 1. Clone the repository and go into the project directory:
     ```bash
     git clone https://github.com/Pstkdev/TotalEnergies-Investment-Simulator.git
@@ -143,7 +145,28 @@ This project is designed for **scenario exploration**, not exact forecasting. Re
 
 Streamlit will display a local URL.
 
+### Option B — Docker Compose
+
+1. Clone the repository and go into the project directory:
+    ```bash
+    git clone https://github.com/Pstkdev/TotalEnergies-Investment-Simulator.git
+    cd TotalEnergies-Investment-Simulator/
+    ```
+
+2. Build and run:
+    ```bash
+    docker compose up --build
+    ```
+Then open http://localhost:8501 (copy paste in your web browser)
+
+If you get a "permission denied ... docker.sock" error on Linux, add your user to the docker group:
+  ```bash
+  sudo usermod -aG docker $USER
+  newgrp docker
+  ```
+  
 ---
+
 
 ## How to use
 
