@@ -157,14 +157,14 @@ Streamlit will display a local URL.
     ```bash
     docker compose up --build
     ```
-Then open http://localhost:8501 (copy paste in your web browser)
+Then open http://localhost:8501
 
 If you get a "permission denied ... docker.sock" error on Linux, add your user to the docker group:
-  ```bash
-  sudo usermod -aG docker $USER
-  newgrp docker
-  ```
-  
+    ```bash
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+
 ---
 
 
