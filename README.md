@@ -1,10 +1,8 @@
 # TotalEnergies Investment Simulator (TTE)
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-purple?logo=pandas&logoColor=white)
-![Plotly](https://img.shields.io/badge/Plotly-Visualization-black?logo=plotly&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-purple)
+![Plotly](https://img.shields.io/badge/Plotly-Visualization-black)
+![yfinance](https://img.shields.io/badge/yfinance-Data%20Source-lightgrey)
 
 A **stochastic** long-term simulator for an investment in **TotalEnergies (TTE)** shares over a chosen time horizon.  
 
